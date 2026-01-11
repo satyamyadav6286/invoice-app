@@ -10,6 +10,7 @@
     "@types/html2canvas": "^1.0.0",
     "@types/jspdf": "^2.0.0",
     "chart.js": "^4.4.4",
+    "date-fns": "^4.1.0",
     "dom-to-image": "^2.6.0",
     "firebase": "^10.13.0",
     "html2canvas": "^1.4.1",
@@ -17,8 +18,10 @@
     "ng2-charts": "^6.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^6.26.1",
     "react-scripts": "5.0.1",
+    "react-toastify": "^11.0.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
