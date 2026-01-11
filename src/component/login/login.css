@@ -11,7 +11,6 @@
 }
 
 .login-container{
-    height: auto;
     min-height: 600px;
     width: calc(100% - 4rem);
     max-width: 1000px;
@@ -19,25 +18,29 @@
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     display: flex;
+    align-items: stretch;
     overflow: hidden;
     margin: 0 auto;
     box-sizing: border-box;
 }
 
 .login-boxes{
-    height: 100%;
     padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .login-left{
     width: 45%;
+    align-self: stretch;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     display: flex;
     flex-direction: column;
     justify-content: center;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .login-left::before {
@@ -94,6 +97,7 @@
 
 .login-right{
     width: 55%;
+    align-self: stretch;
     display: flex;
     flex-direction: column;
     justify-content: center;
