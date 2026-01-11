@@ -7,12 +7,13 @@
     align-items: center;
     padding: 2rem;
     box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .login-container{
     height: auto;
     min-height: 600px;
-    width: 100%;
+    width: calc(100% - 4rem);
     max-width: 1000px;
     background-color: white;
     border-radius: 20px;
@@ -20,6 +21,7 @@
     display: flex;
     overflow: hidden;
     margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .login-boxes{
@@ -279,11 +281,14 @@
 @media (max-width: 768px) {
     .login-wrapper {
         padding: 1rem;
+        overflow-x: hidden;
     }
 
     .login-container {
         flex-direction: column;
         max-width: 100%;
+        width: calc(100% - 2rem);
+        margin: 0 auto;
     }
 
     .login-left {
