@@ -1,72 +1,62 @@
 import React, { useState, useEffect } from 'react'
 import {db} from '../../firebase'
-import { Timestamp, addDoc, collection, query, where, getDocs, orderBy, limit} from 'firebase/firestore'
-import { useNavigate } from 'react-router-dom'
+import { Timestamp, doc, updateDoc } from 'firebase/firestore'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { format } from 'date-fns'
 import './NewInvoice.css'
 
-const NewInvoice = () => {
-    const [customerName, setCustomerName] = useState('')
-    const [phone, setPhone] = useState('')
-    const [address, setAddress] = useState('')
-    const [email, setEmail] = useState('')
-    const [invoiceNumber, setInvoiceNumber] = useState('')
-    const [invoiceDate, setInvoiceDate] = useState(format(new Date(), 'yyyy-MM-dd'))
-    const [dueDate, setDueDate] = useState('')
-    const [status, setStatus] = useState('draft')
-    const [notes, setNotes] = useState('')
+const EditInvoice = () => {
+    const location = useLocation()
+    const invoiceData = location.state
+    const navigation = useNavigate()
+    
+    const [customerName, setCustomerName] = useState(invoiceData?.customerName || invoiceData?.to || '')
+    const [phone, setPhone] = useState(invoiceData?.phone || '')
+    const [address, setAddress] = useState(invoiceData?.address || '')
+    const [email, setEmail] = useState(invoiceData?.email || '')
+    const [invoiceNumber, setInvoiceNumber] = useState(invoiceData?.invoiceNumber || '')
+    
+    const formatDateForInput = (dateField) => {
+        if (!dateField) return format(new Date(), 'yyyy-MM-dd')
+        try {
+            const date = dateField.toDate ? dateField.toDate() : new Date(dateField.seconds * 1000)
+            return format(date, 'yyyy-MM-dd')
+        } catch {
+            return format(new Date(), 'yyyy-MM-dd')
+        }
+    }
+    
+    const [invoiceDate, setInvoiceDate] = useState(formatDateForInput(invoiceData?.invoiceDate || invoiceData?.date))
+    const [dueDate, setDueDate] = useState(formatDateForInput(invoiceData?.dueDate))
+    const [status, setStatus] = useState(invoiceData?.status || 'draft')
+    const [notes, setNotes] = useState(invoiceData?.notes || '')
     
     const [productName, setProductName] = useState('')
     const [productPrice, setProductPrice] = useState('')
     const [productQty, setProductQty] = useState(1)
     
-    const [products, setProducts] = useState([])
+    const [products, setProducts] = useState(invoiceData?.products || invoiceData?.product || [])
     const [subtotal, setSubtotal] = useState(0)
-    const [taxRate, setTaxRate] = useState(0)
-    const [discountType, setDiscountType] = useState('percentage')
-    const [discount, setDiscount] = useState(0)
+    const [taxRate, setTaxRate] = useState(invoiceData?.taxRate || 0)
+    const [discountType, setDiscountType] = useState(invoiceData?.discountType || 'percentage')
+    const [discount, setDiscount] = useState(invoiceData?.discount || 0)
     const [taxAmount, setTaxAmount] = useState(0)
     const [discountAmount, setDiscountAmount] = useState(0)
     const [total, setTotal] = useState(0)
     
     const [isLoading, setLoading] = useState(false)
-    const navigation = useNavigate()
-
-    useEffect(() => {
-        generateInvoiceNumber()
-        const defaultDueDate = new Date()
-        defaultDueDate.setDate(defaultDueDate.getDate() + 30)
-        setDueDate(format(defaultDueDate, 'yyyy-MM-dd'))
-    }, [])
 
     useEffect(() => {
         calculateTotals()
     }, [products, taxRate, discount, discountType])
 
-    const generateInvoiceNumber = async () => {
-        try {
-            const q = query(
-                collection(db, 'invoices'),
-                where('uid', '==', localStorage.getItem('uid')),
-                orderBy('invoiceNumber', 'desc'),
-                limit(1)
-            )
-            const snapshot = await getDocs(q)
-            
-            if (snapshot.empty) {
-                setInvoiceNumber('INV-0001')
-            } else {
-                const lastInvoice = snapshot.docs[0].data()
-                const lastNumber = lastInvoice.invoiceNumber || 'INV-0000'
-                const numPart = parseInt(lastNumber.split('-')[1]) + 1
-                setInvoiceNumber(`INV-${String(numPart).padStart(4, '0')}`)
-            }
-        } catch (error) {
-            console.log(error)
-            setInvoiceNumber(`INV-${String(Date.now()).slice(-4)}`)
+    useEffect(() => {
+        // Recalculate totals when component mounts with existing data
+        if (invoiceData) {
+            calculateTotals()
         }
-    }
+    }, [])
 
     const calculateTotals = () => {
         let sub = 0
@@ -98,7 +88,7 @@ const NewInvoice = () => {
         }
 
         const newProduct = {
-            id: products.length,
+            id: products.length > 0 ? Math.max(...products.map(p => p.id || 0)) + 1 : 0,
             name: productName,
             price: parseFloat(productPrice),
             qty: parseFloat(productQty)
@@ -116,7 +106,7 @@ const NewInvoice = () => {
         toast.success('Product removed')
     }
 
-    const saveData = async () => {
+    const updateData = async () => {
         if (!customerName || !phone || !address) {
             toast.error('Please fill in customer details')
             return
@@ -135,7 +125,7 @@ const NewInvoice = () => {
         setLoading(true)
 
         try {
-            await addDoc(collection(db, 'invoices'), {
+            await updateDoc(doc(db, 'invoices', invoiceData.id), {
                 customerName: customerName,
                 phone: phone,
                 address: address,
@@ -153,23 +143,41 @@ const NewInvoice = () => {
                 discountAmount: discountAmount,
                 total: total,
                 notes: notes,
-                uid: localStorage.getItem('uid'),
-                createdAt: Timestamp.fromDate(new Date())
+                updatedAt: Timestamp.fromDate(new Date())
             })
             
-            toast.success('Invoice created successfully!')
+            toast.success('Invoice updated successfully!')
             navigation('/dashboard/invoices')
         } catch (error) {
             console.error(error)
-            toast.error('Error creating invoice. Please try again.')
+            toast.error('Error updating invoice. Please try again.')
             setLoading(false)
         }
+    }
+
+    if (!invoiceData) {
+        return (
+            <div className='new-invoice-page'>
+                <div className='invoice-page-header'>
+                    <h1 className='page-title'>Edit Invoice</h1>
+                    <button 
+                        onClick={() => navigation('/dashboard/invoices')} 
+                        className='btn btn-secondary'
+                    >
+                        <i className="fa-solid fa-arrow-left"></i> Back to Invoices
+                    </button>
+                </div>
+                <div style={{textAlign: 'center', padding: '2rem'}}>
+                    <p>No invoice data found. Please select an invoice to edit.</p>
+                </div>
+            </div>
+        )
     }
 
     return (
         <div className='new-invoice-page'>
             <div className='invoice-page-header'>
-                <h1 className='page-title'>Create New Invoice</h1>
+                <h1 className='page-title'>Edit Invoice</h1>
                 <div className='header-actions'>
                     <button 
                         onClick={() => navigation('/dashboard/invoices')} 
@@ -179,17 +187,17 @@ const NewInvoice = () => {
                         <i className="fa-solid fa-times"></i> Cancel
                     </button>
                     <button 
-                        onClick={saveData} 
+                        onClick={updateData} 
                         className='btn btn-primary'
                         disabled={isLoading}
                     >
                         {isLoading ? (
                             <>
-                                <i className="fa-solid fa-spinner fa-spin"></i> Saving...
+                                <i className="fa-solid fa-spinner fa-spin"></i> Updating...
                             </>
                         ) : (
                             <>
-                                <i className="fa-solid fa-save"></i> Save Invoice
+                                <i className="fa-solid fa-save"></i> Update Invoice
                             </>
                         )}
                     </button>
@@ -359,7 +367,7 @@ const NewInvoice = () => {
                                 </thead>
                                 <tbody>
                                     {products.map((product, index) => (
-                                        <tr key={product.id}>
+                                        <tr key={product.id || index}>
                                             <td>{index + 1}</td>
                                             <td>{product.name}</td>
                                             <td>₹{product.price.toFixed(2)}</td>
@@ -456,4 +464,4 @@ const NewInvoice = () => {
     )
 }
 
-export default NewInvoice
+export default EditInvoice

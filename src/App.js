@@ -7,6 +7,8 @@ import Dashboard from './component/dashboard/Dashboard';
 import Home from './component/dashboard/Home';
 import Invoices from './component/dashboard/Invoices';
 import NewInvoice from './component/dashboard/NewInvoice';
+import EditInvoice from './component/dashboard/EditInvoice';
+import Clients from './component/dashboard/Clients';
 import Setting from './component/dashboard/Setting';
 import InvoiceDetail from './component/InvoiceDetail';
 
@@ -20,6 +22,8 @@ function App() {
       {path:'home',Component:Home},
       {path:'invoices',Component:Invoices},
       {path:'new-invoice',Component:NewInvoice},
+      {path:'edit-invoice',Component:EditInvoice},
+      {path:'clients',Component:Clients},
       {path:'setting',Component:Setting},
       {path:'invoice-detail',Component:InvoiceDetail}
     ]}
