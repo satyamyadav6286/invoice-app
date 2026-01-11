@@ -22,6 +22,8 @@
     overflow: hidden;
     margin: 0 auto;
     box-sizing: border-box;
+    position: relative;
+    isolation: isolate;
 }
 
 .login-boxes{
@@ -40,7 +42,10 @@
     flex-direction: column;
     justify-content: center;
     position: relative;
-    overflow: visible;
+    overflow: hidden;
+    z-index: 1;
+    user-select: none;
+    pointer-events: none;
 }
 
 .login-left::before {
@@ -52,6 +57,8 @@
     height: 200%;
     background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
     animation: pulse 20s infinite;
+    pointer-events: none;
+    z-index: 0;
 }
 
 @keyframes pulse {
@@ -62,6 +69,7 @@
 .login-left-content {
     position: relative;
     z-index: 1;
+    pointer-events: none;
 }
 
 .login-left h1 {
@@ -103,11 +111,17 @@
     justify-content: center;
     align-items: center;
     background-color: white;
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
 }
 
 .login-form-wrapper {
     width: 100%;
     max-width: 400px;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 .login-heading{
@@ -127,6 +141,9 @@
 
 .login-form {
     width: 100%;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 .form-group {
@@ -143,6 +160,8 @@
 
 .password-input-wrapper {
     position: relative;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 .password-toggle {
@@ -158,6 +177,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 11;
+    pointer-events: auto;
 }
 
 .password-toggle:hover {
@@ -173,6 +194,9 @@
     transition: all 0.3s ease;
     font-family: inherit;
     background-color: #f7fafc;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 .login-input:focus {
@@ -214,6 +238,9 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 .login-btn:hover:not(:disabled) {
@@ -239,6 +266,9 @@
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 .register-link:hover{
