@@ -98,7 +98,7 @@ const NewInvoice = () => {
         }
 
         const newProduct = {
-            id: products.length,
+            id: products.length > 0 ? Math.max(...products.map(p => p.id || 0)) + 1 : 0,
             name: productName,
             price: parseFloat(productPrice),
             qty: parseFloat(productQty)
@@ -358,24 +358,28 @@ const NewInvoice = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {products.map((product, index) => (
-                                        <tr key={product.id}>
-                                            <td>{index + 1}</td>
-                                            <td>{product.name}</td>
-                                            <td>₹{product.price.toFixed(2)}</td>
-                                            <td>{product.qty}</td>
-                                            <td>₹{(product.price * product.qty).toFixed(2)}</td>
-                                            <td>
-                                                <button 
-                                                    onClick={() => removeProduct(product.id)}
-                                                    className='btn-icon btn-danger'
-                                                    title='Remove'
-                                                >
-                                                    <i className="fa-solid fa-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    {products.map((product, index) => {
+                                        const price = Number(product.price) || 0
+                                        const qty = Number(product.qty) || 0
+                                        return (
+                                            <tr key={product.id}>
+                                                <td>{index + 1}</td>
+                                                <td>{product.name}</td>
+                                                <td>₹{price.toFixed(2)}</td>
+                                                <td>{qty}</td>
+                                                <td>₹{(price * qty).toFixed(2)}</td>
+                                                <td>
+                                                    <button 
+                                                        onClick={() => removeProduct(product.id)}
+                                                        className='btn-icon btn-danger'
+                                                        title='Remove'
+                                                    >
+                                                        <i className="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
                                 </tbody>
                             </table>
                         </div>
@@ -387,7 +391,7 @@ const NewInvoice = () => {
                     <div className='pricing-summary'>
                         <div className='summary-row'>
                             <span>Subtotal:</span>
-                            <span>₹{subtotal.toFixed(2)}</span>
+                            <span>₹{(Number(subtotal) || 0).toFixed(2)}</span>
                         </div>
                         
                         <div className='summary-row'>
@@ -412,7 +416,7 @@ const NewInvoice = () => {
                                     </select>
                                 </div>
                             </div>
-                            <span>- ₹{discountAmount.toFixed(2)}</span>
+                            <span>- ₹{(Number(discountAmount) || 0).toFixed(2)}</span>
                         </div>
 
                         <div className='summary-row'>
@@ -429,12 +433,12 @@ const NewInvoice = () => {
                                 />
                                 <span>%</span>
                             </div>
-                            <span>+ ₹{taxAmount.toFixed(2)}</span>
+                            <span>+ ₹{(Number(taxAmount) || 0).toFixed(2)}</span>
                         </div>
 
                         <div className='summary-row summary-total'>
                             <span>Total Amount:</span>
-                            <span>₹{total.toFixed(2)}</span>
+                            <span>₹{(Number(total) || 0).toFixed(2)}</span>
                         </div>
                     </div>
                 </div>

@@ -264,7 +264,7 @@ const Invoices = () => {
                   <div className='invoice-card-footer'>
                     <div className='invoice-amount'>
                       <span className='amount-label'>Total:</span>
-                      <span className='amount-value'>₹{invoice.total?.toFixed(2) || '0.00'}</span>
+                      <span className='amount-value'>₹{(Number(invoice.total) || 0).toFixed(2)}</span>
                     </div>
                     <div className='invoice-actions'>
                       <button 

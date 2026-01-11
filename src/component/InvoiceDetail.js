@@ -11,7 +11,7 @@ import './InvoiceDetail.css'
 const InvoiceDetail = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const [data, setData] = useState(location.state)
+  const [data, setData] = useState(location.state || {})
   const [isLoading, setIsLoading] = useState(false)
 
   const formatDate = (dateField) => {
@@ -25,8 +25,17 @@ const InvoiceDetail = () => {
   }
 
   const printInvoice = () => {
+    if (!data || !data.id) {
+      toast.error('No invoice data available')
+      return
+    }
     setIsLoading(true)
     const input = document.getElementById('invoice')
+    if (!input) {
+      toast.error('Invoice element not found')
+      setIsLoading(false)
+      return
+    }
     
     html2canvas(input, { useCORS: true, scale: 2 })
       .then((canvas) => {
@@ -55,6 +64,10 @@ const InvoiceDetail = () => {
   }
 
   const markAsPaid = async () => {
+    if (!data || !data.id) {
+      toast.error('No invoice data available')
+      return
+    }
     if (window.confirm('Mark this invoice as paid?')) {
       try {
         await updateDoc(doc(db, 'invoices', data.id), {
@@ -83,10 +96,10 @@ const InvoiceDetail = () => {
   }
 
   const products = data.products || data.product || []
-  const subtotal = data.subtotal || data.total || 0
-  const taxAmount = data.taxAmount || 0
-  const discountAmount = data.discountAmount || 0
-  const total = data.total || 0
+  const subtotal = Number(data.subtotal) || Number(data.total) || 0
+  const taxAmount = Number(data.taxAmount) || 0
+  const discountAmount = Number(data.discountAmount) || 0
+  const total = Number(data.total) || 0
 
   return (
     <div className='invoice-detail-page'>
@@ -210,7 +223,7 @@ const InvoiceDetail = () => {
             )}
             {taxAmount > 0 && (
               <div className='total-row'>
-                <span className='total-label'>Tax ({data.taxRate || 0}%):</span>
+                <span className='total-label'>Tax ({Number(data.taxRate) || 0}%):</span>
                 <span className='total-value'>₹{taxAmount.toFixed(2)}</span>
               </div>
             )}

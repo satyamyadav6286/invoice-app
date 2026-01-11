@@ -278,7 +278,7 @@ const Home = () => {
                   </div>
                   <div className='invoice-item-meta'>
                     <span className='invoice-date'>{formatDate(invoice.invoiceDate || invoice.date)}</span>
-                    <span className='invoice-amount'>₹{(invoice.total || 0).toFixed(2)}</span>
+                    <span className='invoice-amount'>₹{(Number(invoice.total) || 0).toFixed(2)}</span>
                   </div>
                 </div>
               ))
